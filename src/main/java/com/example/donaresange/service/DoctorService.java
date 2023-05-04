@@ -2,7 +2,6 @@ package com.example.donaresange.service;
 
 import com.example.donaresange.dto.DoctorDTO;
 import com.example.donaresange.model.Doctor;
-import com.example.donaresange.model.Donor;
 import com.example.donaresange.model.Location;
 import com.example.donaresange.model.User;
 import com.example.donaresange.repo.DoctorRepo;
@@ -43,11 +42,7 @@ public class DoctorService {
 
     public List<DoctorDTO> getAll(){
         Iterable<Doctor> doctors = doctorRepo.findAll();
-        List<DoctorDTO> doctorDTOS = new ArrayList<>();
-        for(Doctor doctor : doctors){
-            doctorDTOS.add(new DoctorDTO(userRepo.findById(doctor.getUserId()).get(), doctor));
-        }
-        return doctorDTOS;
+        return getDoctorDTOS(doctors);
     }
 
     public Boolean edit(Integer doctorId, String email, String password, String name, Integer locationId, Integer shiftStart, Integer shiftEnd){
@@ -77,5 +72,26 @@ public class DoctorService {
         userRepo.delete(user);
         doctorRepo.delete(optionalDoctor.get());
         return true;
+    }
+
+    public Iterable<DoctorDTO> getByLocation(Integer locationId){
+        Iterable<Doctor> doctors;
+        if(locationId == 0){
+            doctors = doctorRepo.findAll();
+        }
+        else{
+            doctors = doctorRepo.findAllByLocationId(locationId);
+        }
+
+        return getDoctorDTOS(doctors);
+    }
+
+    private List<DoctorDTO> getDoctorDTOS(Iterable<Doctor> doctors) {
+        List<DoctorDTO> doctorDTOS = new ArrayList<>();
+        for(Doctor doctor : doctors){
+            doctor.setLocation(locationRepo.findById(doctor.getLocationId()).get().getAddress());
+            doctorDTOS.add(new DoctorDTO(userRepo.findById(doctor.getUserId()).get(), doctor));
+        }
+        return doctorDTOS;
     }
 }

@@ -9,6 +9,14 @@ import lombok.*;
 @Data
 @Entity
 public class Doctor {
+    public Doctor(Integer id, Integer userId, Integer locationId, Integer shiftStart, Integer shiftEnd) {
+        this.id = id;
+        this.userId = userId;
+        this.locationId = locationId;
+        this.shiftStart = shiftStart;
+        this.shiftEnd = shiftEnd;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -25,4 +33,6 @@ public class Doctor {
 
     @Column(name = "shift_end")
     private Integer shiftEnd;
+
+    private String location;
 }

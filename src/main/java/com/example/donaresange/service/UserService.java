@@ -17,12 +17,14 @@ public class UserService {
     private final UserRepo userRepo;
     private final DonorRepo donorRepo;
 
-    public Boolean register(String email, String password, String name, String bloodType, String address){
+    public Boolean register(String email, String password, String confirmPassword, String name, String bloodType, String address){
         if(email.length()==0 || password.length()==0 || name.length()==0 || bloodType.length()==0 || address.length()==0)
             throw new RuntimeException("Invalid input!");
         Optional<User> optionalUser = userRepo.findByEmail(email);
         if(optionalUser.isPresent())
             throw new RuntimeException("User already exists!");
+        if(confirmPassword.compareTo(password)!=0)
+            throw new RuntimeException("Password not the same!");
         User user = new User(0, email, password, name, "donor");
         userRepo.save(user);
         user = userRepo.findByEmail(email).get();

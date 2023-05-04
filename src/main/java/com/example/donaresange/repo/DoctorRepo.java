@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DoctorRepo extends JpaRepository<Doctor,Integer> {
+    Iterable<Doctor> findAllByLocationId(Integer locationId);
 }

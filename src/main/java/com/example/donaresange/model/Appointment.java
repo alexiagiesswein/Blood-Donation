@@ -27,4 +27,10 @@ public class Appointment {
 
     @Column(name = "time_minutes")
     private Integer timeMinutes;
+
+    @Column(name = "donated_ml")
+    private Integer donatedMl;
+
+    @Column(name = "blood_type")
+    private String bloodType;
 }
