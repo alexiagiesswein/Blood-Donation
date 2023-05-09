@@ -54,28 +54,30 @@ public class AppointmentService {
         Appointment appointment = new Appointment(0, doctorId, donorId, new Date(date.getTime()), timeMinutes, 0, optionalDonor.get().getBloodType());
         appointmentRepo.save(appointment);
 
-        User user = userRepo.findById(donorId).get();
+        Optional<User> optionalUser = userRepo.findById(optionalDonor.get().getUserId());
 
-        emailSenderService.sendMailWithAttachment(user.getEmail(),
-                "You have made an appointment!" ,
-                "Confirm appointment");
+        if (!optionalDonor.isEmpty()) {
 
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            emailSenderService.sendMailWithAttachment(optionalUser.get().getEmail(),
+                    "You have made an appointment!",
+                    "Confirm appointment");
+
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 
             scheduler.schedule(() -> {
                 try {
-                    emailSenderService.sendMailWithAttachment(user.getEmail(),
-                            "Don't forget your appointment!" ,
+                    emailSenderService.sendMailWithAttachment(optionalUser.get().getEmail(),
+                            "Don't forget your appointment!",
                             "You have an appointment tomorrow!");
                 } catch (MessagingException e) {
                     e.printStackTrace();
                 }
             }, 5, TimeUnit.SECONDS);
 
-            scheduler.schedule(scheduler::shutdown, 2, TimeUnit.SECONDS);
+            scheduler.schedule(scheduler::shutdown, 5, TimeUnit.SECONDS);
 
-
+        }
 
         return true;
     }
