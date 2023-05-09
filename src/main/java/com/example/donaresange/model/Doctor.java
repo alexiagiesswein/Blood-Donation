@@ -34,5 +34,6 @@ public class Doctor {
     @Column(name = "shift_end")
     private Integer shiftEnd;
 
+    @Column(name = "location")
     private String location;
 }

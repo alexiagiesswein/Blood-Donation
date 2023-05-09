@@ -1,6 +1,7 @@
 package com.example.donaresange.controller;
 
 import com.example.donaresange.dto.DoctorDTO;
+import com.example.donaresange.dto.DonorDTO;
 import com.example.donaresange.model.Doctor;
 import com.example.donaresange.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ public class DoctorController {
         return doctorService.getAll();
     }
 
+
     @GetMapping("/doctor")
     public Iterable<DoctorDTO> getByLocation(@RequestParam(defaultValue = "0") Integer locationId) {
         return doctorService.getByLocation(locationId);
@@ -38,5 +40,10 @@ public class DoctorController {
     @DeleteMapping("/doctor/delete")
     public Boolean delete(@RequestParam() Integer doctorId) {
         return doctorService.delete(doctorId);
+    }
+
+    @GetMapping("/doctor/get")
+    public DoctorDTO get(@RequestParam() Integer doctorId) {
+        return doctorService.get(doctorId);
     }
 }

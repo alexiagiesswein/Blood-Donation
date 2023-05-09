@@ -19,6 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +40,7 @@ public class AppointmentService {
 
 
     public Boolean add(Integer doctorId, Integer donorId, String time) throws ParseException, MessagingException {
-        java.util.Date date = (new SimpleDateFormat("dd/MM/yyyy HH:mm")).parse(time);
+        java.util.Date date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).parse(time);
         Optional<Doctor> optionalDoctor = doctorRepo.findById(doctorId);
         if (optionalDoctor.isEmpty())
             throw new RuntimeException("Doctor doesn't exist");
@@ -57,16 +60,33 @@ public class AppointmentService {
                 "You have made an appointment!" ,
                 "Confirm appointment");
 
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+
+            scheduler.schedule(() -> {
+                try {
+                    emailSenderService.sendMailWithAttachment(user.getEmail(),
+                            "Don't forget your appointment!" ,
+                            "You have an appointment tomorrow!");
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            }, 5, TimeUnit.SECONDS);
+
+            scheduler.schedule(scheduler::shutdown, 2, TimeUnit.SECONDS);
+
+
+
         return true;
     }
 
-    public Iterable<Appointment> get(Integer donorId, Integer doctorId) {
-        if(donorId != 0 && doctorId != 0)
-            return appointmentRepo.findAllByDonorIdAndDoctorId(donorId, doctorId);
-        else if(donorId != 0)
-            return appointmentRepo.findAllByDonorId(donorId);
-        else if(doctorId != 0)
-            return appointmentRepo.findAllByDoctorId(doctorId);
+    public Iterable<Appointment> get(Integer userId) {
+        Optional<Doctor> optionalDoctor = doctorRepo.findByUserId(userId);
+        Optional<Donor> optionalDonor = donorRepo.findByUserId(userId);
+        if(!optionalDonor.isEmpty())
+            return appointmentRepo.findAllByDonorId(optionalDonor.get().getId());
+        else if(!optionalDoctor.isEmpty())
+            return appointmentRepo.findAllByDoctorId(optionalDoctor.get().getId());
         return null;
     }
 
@@ -120,6 +140,9 @@ public class AppointmentService {
     }
 
     public Iterable<Appointment> appointmentsByDate(Integer doctorId, Date date){
-        return appointmentRepo.findAllByDateAndDoctorIdAndDonatedMl(date, doctorId, 0);
+        Optional<Doctor> optionalDoctor = doctorRepo.findByUserId(doctorId);
+        if(!optionalDoctor.isEmpty())
+        return appointmentRepo.findAllByDateAndDoctorId(date, optionalDoctor.get().getId());
+        return null;
     }
 }

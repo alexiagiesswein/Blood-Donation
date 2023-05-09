@@ -45,7 +45,7 @@ public class DonorService {
     }
 
     public DonorDTO get(Integer donorId){
-        Optional<Donor> optionalDonor = donorRepo.findById(donorId);
+        Optional<Donor> optionalDonor = donorRepo.findByUserId(donorId);
         if(optionalDonor.isEmpty())
             throw new RuntimeException("Donor doesn't exist!");
         User user = userRepo.findById(optionalDonor.get().getUserId()).get();

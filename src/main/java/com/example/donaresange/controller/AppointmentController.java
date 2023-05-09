@@ -23,8 +23,8 @@ public class AppointmentController {
     }
 
     @GetMapping("/appointments")
-    public Iterable<Appointment> get(@RequestParam(defaultValue = "0") Integer donorId, @RequestParam(defaultValue = "0") Integer doctorId){
-        return appointmentService.get(donorId, doctorId);
+    public Iterable<Appointment> get(@RequestParam(defaultValue = "0") Integer userId){
+        return appointmentService.get(userId);
     }
 
     @GetMapping("/appointment/getHours")
@@ -42,7 +42,7 @@ public class AppointmentController {
         return appointmentService.confirm(id, ml);
     }
 
-    @PutMapping("/appointment/today")
+    @GetMapping("/appointment/today")
     public Iterable<Appointment> appointmentsByDate(@RequestParam() Integer doctorId, @RequestParam() Date date){
         return  appointmentService.appointmentsByDate(doctorId, date);
     }
